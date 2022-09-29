@@ -57,7 +57,7 @@ def aa_flatten_dict_tu(
         for indi, v2 in enumerate(v):
 
             if isinstance(v2, allowed):
-                yield v2, listitem
+                yield v2, (listitem + (indi,))
             #  if the value is not in our allowed data types, we have to check if it is an iterable
             else:
                 yield from aa_flatten_dict_tu(
@@ -77,7 +77,7 @@ def aa_flatten_dict_tu(
 
                 try:
                     if isinstance(v2, allowed):
-                        yield v2, listitem
+                        yield v2, (listitem + (indi2,))
 
                     else:
                         yield aa_flatten_dict_tu(
@@ -121,7 +121,7 @@ def fla_tu(
 ):
 
     if isinstance(item, allowed):  # allowed items, so let's yield them
-        yield item, walkthrough
+        yield item, Tuppsub((walkthrough,))
     elif isinstance(item, forbidden):
         for ini, xaa in enumerate(item):
             try:
@@ -195,7 +195,7 @@ def fla_tu(
         except Exception:
 
             yield item, Tuppsub(
-                (walkthrough + Tuppsub(item,))
+                (walkthrough,)
             )  # in case of an exception, we yield  (value, (key1,key2,...))
 
 
