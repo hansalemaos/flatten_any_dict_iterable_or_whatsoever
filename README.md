@@ -1,5 +1,313 @@
 # No more sleepless nights due to a nested dict, json, list or whatsoever
 
+### Updates
+
+**2022/09/30**: Fixed some problems with ProtectedDict and ProtectedList,ProtectedTuple
+
+**2022/09/30**: Can be used as a generator now: **from flatten_any_dict_iterable_or_whatsoever import fla_tu**
+
+**2022/09/30**: New functions: **get_from_original_iter**,**set_in_original_iter**, **create_random_dict**
+
+**2022/09/30**: Added doc strings
+
+## How to use the new functions **get_from_original_iter**,**set_in_original_iter**,
+
+```python
+data={'level1': {'t1': {'s1': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9},
+                   's2': {'col1': 1, 'col2': 5, 'col3': 4, 'col4': 8},
+                   's3': {'col1': 11, 'col2': 8, 'col3': 2, 'col4': 9},
+                   's4': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9}},
+                   ....]
+list(fla_tu(data))
+
+    [(5, ('level1', 't1', 's1', 'col1')),
+     (4, ('level1', 't1', 's1', 'col2')),
+     (4, ('level1', 't1', 's1', 'col3')),
+     (9, ('level1', 't1', 's1', 'col4')),
+     ....]
+
+#After having flattened the iterable using fla_tu(), you will have a list of tuples:
+#You can use now:
+
+get_from_original_iter(iterable=data, keys=('level1', 't1', 's1', 'col1'))
+Out[6]: 5
+#to access the values.
+
+set_in_original_iter(iterable=data, keys=('level1', 't1', 's1', 'col1'), value=1000000000000000000)
+#to change values of the ORIGINAL ITERABLE!.
+
+
+Out[8]:
+{'level1': {'t1': {'s1': {'col1': 1000000000000000000,
+    'col2': 4,
+    'col3': 4,
+    'col4': 9},
+   's2': {'col1': 1, 'col2': 5, 'col3': 4, 'col4': 8},
+   's3': {'col1': 11, 'col2': 8, 'col3': 2, 'col4': 9},
+   's4': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9}},
+
+THIS FUNCTION RETURNS >>>NONE<<<
+BECAUSE IT CHANGES THE ORIGINAL ITERABLE!
+
+    BE CAREFUL WHAT YOU ARE DOING!!
+
+#DON'T USE data=set_in_original_iter(iterable=data, keys=('level1', 't1', 's1', 'col1'), value=1000000000000000000)
+
+
+#If you still need the original data, use:
+
+from copy import deepcopy
+data2 = deepcopy(data)
+list(fla_tu(data))
+set_in_original_iter(iterable=data, keys=('level1', 't1', 's1', 'col1'), value=1000000000000000000)
+data will be changed
+data2 remains unchanged
+
+   
+```
+
+```python
+from flatten_any_dict_iterable_or_whatsoever import ProtectedList,ProtectedDict,ProtectedTuple
+from flatten_any_dict_iterable_or_whatsoever import fla_tu
+
+#without protection
+data={'level1': {'t1': {'s1': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9},
+                   's2': {'col1': 1, 'col2': 5, 'col3': 4, 'col4': 8},
+                   's3': {'col1': 11, 'col2': 8, 'col3': 2, 'col4': 9},
+                   's4': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9}},
+            't2': {'s1': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9},
+                   's2': {'col1': 1, 'col2': 5, 'col3': 4, 'col4': 8},
+                   's3': {'col1': 11, 'col2': 8, 'col3': 2, 'col4': 9},
+                   's4': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9}},
+            't3': {'s1': {'col1': 1, 'col2': 2, 'col3': 3, 'col4': 4},
+                   's2': {'col1': 5, 'col2': 6, 'col3': 7, 'col4': 8},
+                   's3': {'col1': 9, 'col2': 10, 'col3': 11, 'col4': 12},
+                   's4': {'col1': 13, 'col2': 14, 'col3': 15, 'col4': 16}}},
+ 'level2': {'t1': {'s1': {'col1': 5, 'col2': 4, 'col3': 9, 'col4': 9},
+                   's2': {'col1': 1, 'col2': 5, 'col3': 4, 'col4': 5},
+                   's3': {'col1': 11, 'col2': 8, 'col3': 2, 'col4': 13},
+                   's4': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 20}},
+            't2': {'s1': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9},
+                   's2': {'col1': 1, 'col2': 5, 'col3': 4, 'col4': 8},
+                   's3': {'col1': 11, 'col2': 8, 'col3': 2, 'col4': 9},
+                   's4': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9}},
+            't3': {'s1': {'col1': 1, 'col2': 2, 'col3': 3, 'col4': 4},
+                   's2': {'col1': 5, 'col2': 6, 'col3': 7, 'col4': 8},
+                   's3': {'col1': 9, 'col2': 10, 'col3': 11, 'col4': 12},
+                   's4': {'col1': 13, 'col2': 14, 'col3': 15, 'col4': 16}}}}
+pprint(list(fla_tu(data)))
+
+print('------------------------------------------')
+#with protection
+data={'level1': {'t1': {'s1': ProtectedDict({'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9}),
+                   's2': {'col1': 1, 'col2': 5, 'col3': 4, 'col4': 8},
+                   's3': {'col1': 11, 'col2': 8, 'col3': 2, 'col4': 9},
+                   's4': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9}},
+            't2': {'s1': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9},
+                   's2': {'col1': 1, 'col2': 5, 'col3': 4, 'col4': 8},
+                   's3': {'col1': 11, 'col2': 8, 'col3': 2, 'col4': 9},
+                   's4': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9}},
+            't3': ProtectedDict({'s1': {'col1': 1, 'col2': 2, 'col3': 3, 'col4': 4},
+                   's2': {'col1': 5, 'col2': 6, 'col3': 7, 'col4': 8},
+                   's3': {'col1': 9, 'col2': 10, 'col3': 11, 'col4': 12},
+                   's4': {'col1': 13, 'col2': 14, 'col3': 15, 'col4': 16}})},
+ 'level2': {'t1': {'s1': {'col1': 5, 'col2': 4, 'col3': 9, 'col4': 9},
+                   's2': {'col1': 1, 'col2': 5, 'col3': 4, 'col4': 5},
+                   's3': {'col1': 11, 'col2': ProtectedList([8,3,5,23,'342342']), 'col3': 2, 'col4': 13},
+                   's4': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 20}},
+            't2': {'s1': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9},
+                   's2': {'col1': 1, 'col2': 5, 'col3': 4, 'col4': 8},
+                   's3': {'col1': 11, 'col2': 8, 'col3': 2, 'col4': 9},
+                   's4': {'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9}},
+            't3': {'s1': {'col1': 1, 'col2': (2,3,4,5), 'col3': ProtectedTuple((2,3,4,5,'32123')), 'col4': 4},
+                   's2': {'col1': 5, 'col2': 6, 'col3': 7, 'col4': 8},
+                   's3': {'col1': 9, 'col2': 10, 'col3': 11, 'col4': 12},
+                   's4': {'col1': 13, 'col2': 14, 'col3': 15, 'col4': 16}}}}
+pprint(list(list(fla_tu(data)))) #Without protection
+[(5, ('level1', 't1', 's1', 'col1')),
+ (4, ('level1', 't1', 's1', 'col2')),
+ (4, ('level1', 't1', 's1', 'col3')),
+ (9, ('level1', 't1', 's1', 'col4')),
+ (1, ('level1', 't1', 's2', 'col1')),
+ (5, ('level1', 't1', 's2', 'col2')),
+ (4, ('level1', 't1', 's2', 'col3')),
+ (8, ('level1', 't1', 's2', 'col4')),
+ (11, ('level1', 't1', 's3', 'col1')),
+ (8, ('level1', 't1', 's3', 'col2')),
+ (2, ('level1', 't1', 's3', 'col3')),
+ (9, ('level1', 't1', 's3', 'col4')),
+ (5, ('level1', 't1', 's4', 'col1')),
+ (4, ('level1', 't1', 's4', 'col2')),
+ (4, ('level1', 't1', 's4', 'col3')),
+ (9, ('level1', 't1', 's4', 'col4')),
+ (5, ('level1', 't2', 's1', 'col1')),
+ (4, ('level1', 't2', 's1', 'col2')),
+ (4, ('level1', 't2', 's1', 'col3')),
+ (9, ('level1', 't2', 's1', 'col4')),
+ (1, ('level1', 't2', 's2', 'col1')),
+ (5, ('level1', 't2', 's2', 'col2')),
+ (4, ('level1', 't2', 's2', 'col3')),
+ (8, ('level1', 't2', 's2', 'col4')),
+ (11, ('level1', 't2', 's3', 'col1')),
+ (8, ('level1', 't2', 's3', 'col2')),
+ (2, ('level1', 't2', 's3', 'col3')),
+ (9, ('level1', 't2', 's3', 'col4')),
+ (5, ('level1', 't2', 's4', 'col1')),
+ (4, ('level1', 't2', 's4', 'col2')),
+ (4, ('level1', 't2', 's4', 'col3')),
+ (9, ('level1', 't2', 's4', 'col4')),
+ (1, ('level1', 't3', 's1', 'col1')),
+ (2, ('level1', 't3', 's1', 'col2')),
+ (3, ('level1', 't3', 's1', 'col3')),
+ (4, ('level1', 't3', 's1', 'col4')),
+ (5, ('level1', 't3', 's2', 'col1')),
+ (6, ('level1', 't3', 's2', 'col2')),
+ (7, ('level1', 't3', 's2', 'col3')),
+ (8, ('level1', 't3', 's2', 'col4')),
+ (9, ('level1', 't3', 's3', 'col1')),
+ (10, ('level1', 't3', 's3', 'col2')),
+ (11, ('level1', 't3', 's3', 'col3')),
+ (12, ('level1', 't3', 's3', 'col4')),
+ (13, ('level1', 't3', 's4', 'col1')),
+ (14, ('level1', 't3', 's4', 'col2')),
+ (15, ('level1', 't3', 's4', 'col3')),
+ (16, ('level1', 't3', 's4', 'col4')),
+ (5, ('level2', 't1', 's1', 'col1')),
+ (4, ('level2', 't1', 's1', 'col2')),
+ (9, ('level2', 't1', 's1', 'col3')),
+ (9, ('level2', 't1', 's1', 'col4')),
+ (1, ('level2', 't1', 's2', 'col1')),
+ (5, ('level2', 't1', 's2', 'col2')),
+ (4, ('level2', 't1', 's2', 'col3')),
+ (5, ('level2', 't1', 's2', 'col4')),
+ (11, ('level2', 't1', 's3', 'col1')),
+ (8, ('level2', 't1', 's3', 'col2')),
+ (2, ('level2', 't1', 's3', 'col3')),
+ (13, ('level2', 't1', 's3', 'col4')),
+ (5, ('level2', 't1', 's4', 'col1')),
+ (4, ('level2', 't1', 's4', 'col2')),
+ (4, ('level2', 't1', 's4', 'col3')),
+ (20, ('level2', 't1', 's4', 'col4')),
+ (5, ('level2', 't2', 's1', 'col1')),
+ (4, ('level2', 't2', 's1', 'col2')),
+ (4, ('level2', 't2', 's1', 'col3')),
+ (9, ('level2', 't2', 's1', 'col4')),
+ (1, ('level2', 't2', 's2', 'col1')),
+ (5, ('level2', 't2', 's2', 'col2')),
+ (4, ('level2', 't2', 's2', 'col3')),
+ (8, ('level2', 't2', 's2', 'col4')),
+ (11, ('level2', 't2', 's3', 'col1')),
+ (8, ('level2', 't2', 's3', 'col2')),
+ (2, ('level2', 't2', 's3', 'col3')),
+ (9, ('level2', 't2', 's3', 'col4')),
+ (5, ('level2', 't2', 's4', 'col1')),
+ (4, ('level2', 't2', 's4', 'col2')),
+ (4, ('level2', 't2', 's4', 'col3')),
+ (9, ('level2', 't2', 's4', 'col4')),
+ (1, ('level2', 't3', 's1', 'col1')),
+ (2, ('level2', 't3', 's1', 'col2')),
+ (3, ('level2', 't3', 's1', 'col3')),
+ (4, ('level2', 't3', 's1', 'col4')),
+ (5, ('level2', 't3', 's2', 'col1')),
+ (6, ('level2', 't3', 's2', 'col2')),
+ (7, ('level2', 't3', 's2', 'col3')),
+ (8, ('level2', 't3', 's2', 'col4')),
+ (9, ('level2', 't3', 's3', 'col1')),
+ (10, ('level2', 't3', 's3', 'col2')),
+ (11, ('level2', 't3', 's3', 'col3')),
+ (12, ('level2', 't3', 's3', 'col4')),
+ (13, ('level2', 't3', 's4', 'col1')),
+ (14, ('level2', 't3', 's4', 'col2')),
+ (15, ('level2', 't3', 's4', 'col3')),
+ (16, ('level2', 't3', 's4', 'col4'))]
+------------------------------------------ #With protection
+[({'col1': 5, 'col2': 4, 'col3': 4, 'col4': 9}, ('level1', 't1', 's1')),
+ (1, ('level1', 't1', 's2', 'col1')),
+ (5, ('level1', 't1', 's2', 'col2')),
+ (4, ('level1', 't1', 's2', 'col3')),
+ (8, ('level1', 't1', 's2', 'col4')),
+ (11, ('level1', 't1', 's3', 'col1')),
+ (8, ('level1', 't1', 's3', 'col2')),
+ (2, ('level1', 't1', 's3', 'col3')),
+ (9, ('level1', 't1', 's3', 'col4')),
+ (5, ('level1', 't1', 's4', 'col1')),
+ (4, ('level1', 't1', 's4', 'col2')),
+ (4, ('level1', 't1', 's4', 'col3')),
+ (9, ('level1', 't1', 's4', 'col4')),
+ (5, ('level1', 't2', 's1', 'col1')),
+ (4, ('level1', 't2', 's1', 'col2')),
+ (4, ('level1', 't2', 's1', 'col3')),
+ (9, ('level1', 't2', 's1', 'col4')),
+ (1, ('level1', 't2', 's2', 'col1')),
+ (5, ('level1', 't2', 's2', 'col2')),
+ (4, ('level1', 't2', 's2', 'col3')),
+ (8, ('level1', 't2', 's2', 'col4')),
+ (11, ('level1', 't2', 's3', 'col1')),
+ (8, ('level1', 't2', 's3', 'col2')),
+ (2, ('level1', 't2', 's3', 'col3')),
+ (9, ('level1', 't2', 's3', 'col4')),
+ (5, ('level1', 't2', 's4', 'col1')),
+ (4, ('level1', 't2', 's4', 'col2')),
+ (4, ('level1', 't2', 's4', 'col3')),
+ (9, ('level1', 't2', 's4', 'col4')),
+ ({'s1': {'col1': 1, 'col2': 2, 'col3': 3, 'col4': 4},
+   's2': {'col1': 5, 'col2': 6, 'col3': 7, 'col4': 8},
+   's3': {'col1': 9, 'col2': 10, 'col3': 11, 'col4': 12},
+   's4': {'col1': 13, 'col2': 14, 'col3': 15, 'col4': 16}},
+  ('level1', 't3')),
+ (5, ('level2', 't1', 's1', 'col1')),
+ (4, ('level2', 't1', 's1', 'col2')),
+ (9, ('level2', 't1', 's1', 'col3')),
+ (9, ('level2', 't1', 's1', 'col4')),
+ (1, ('level2', 't1', 's2', 'col1')),
+ (5, ('level2', 't1', 's2', 'col2')),
+ (4, ('level2', 't1', 's2', 'col3')),
+ (5, ('level2', 't1', 's2', 'col4')),
+ (11, ('level2', 't1', 's3', 'col1')),
+ ([8, 3, 5, 23, '342342'], ('level2', 't1', 's3', 'col2')),
+ (2, ('level2', 't1', 's3', 'col3')),
+ (13, ('level2', 't1', 's3', 'col4')),
+ (5, ('level2', 't1', 's4', 'col1')),
+ (4, ('level2', 't1', 's4', 'col2')),
+ (4, ('level2', 't1', 's4', 'col3')),
+ (20, ('level2', 't1', 's4', 'col4')),
+ (5, ('level2', 't2', 's1', 'col1')),
+ (4, ('level2', 't2', 's1', 'col2')),
+ (4, ('level2', 't2', 's1', 'col3')),
+ (9, ('level2', 't2', 's1', 'col4')),
+ (1, ('level2', 't2', 's2', 'col1')),
+ (5, ('level2', 't2', 's2', 'col2')),
+ (4, ('level2', 't2', 's2', 'col3')),
+ (8, ('level2', 't2', 's2', 'col4')),
+ (11, ('level2', 't2', 's3', 'col1')),
+ (8, ('level2', 't2', 's3', 'col2')),
+ (2, ('level2', 't2', 's3', 'col3')),
+ (9, ('level2', 't2', 's3', 'col4')),
+ (5, ('level2', 't2', 's4', 'col1')),
+ (4, ('level2', 't2', 's4', 'col2')),
+ (4, ('level2', 't2', 's4', 'col3')),
+ (9, ('level2', 't2', 's4', 'col4')),
+ (1, ('level2', 't3', 's1', 'col1')),
+ (2, ('level2', 't3', 's1', 'col2', 0)),
+ (3, ('level2', 't3', 's1', 'col2', 1)),
+ (4, ('level2', 't3', 's1', 'col2', 2)),
+ (5, ('level2', 't3', 's1', 'col2', 3)),
+ ((2, 3, 4, 5, '32123'), ('level2', 't3', 's1', 'col3')),
+ (4, ('level2', 't3', 's1', 'col4')),
+ (5, ('level2', 't3', 's2', 'col1')),
+ (6, ('level2', 't3', 's2', 'col2')),
+ (7, ('level2', 't3', 's2', 'col3')),
+ (8, ('level2', 't3', 's2', 'col4')),
+ (9, ('level2', 't3', 's3', 'col1')),
+ (10, ('level2', 't3', 's3', 'col2')),
+ (11, ('level2', 't3', 's3', 'col3')),
+ (12, ('level2', 't3', 's3', 'col4')),
+ (13, ('level2', 't3', 's4', 'col1')),
+ (14, ('level2', 't3', 's4', 'col2')),
+ (15, ('level2', 't3', 's4', 'col3')),
+ (16, ('level2', 't3', 's4', 'col4'))]
+```
+
 ### Install
 
 ```python
