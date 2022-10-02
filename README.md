@@ -1,5 +1,7 @@
 # No more sleepless nights due to a nested dict, json, list or whatsoever
 
+#### A convenient way to handle nested iterables! Works only with Python 3.9 and up!
+
 ### Updates
 
 **2022/09/30**: Fixed some problems with ProtectedDict and ProtectedList,ProtectedTuple
@@ -62,8 +64,6 @@ list(fla_tu(data))
 set_in_original_iter(iterable=data, keys=('level1', 't1', 's1', 'col1'), value=1000000000000000000)
 data will be changed
 data2 remains unchanged
-
-   
 ```
 
 ```python
