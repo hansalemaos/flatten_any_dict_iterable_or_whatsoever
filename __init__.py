@@ -39,23 +39,23 @@ class ProtectedSet(set):
 
 
 def aa_flatten_dict_tu(
-    v: dict,
-    listitem: tuple,
-    forbidden: tuple = (list, tuple, set, frozenset),
-    allowed: tuple = (
-        str,
-        int,
-        float,
-        complex,
-        bool,
-        bytes,
-        type(None),
-        ProtectedTuple,
-        ProtectedList,
-        ProtectedDict,
-        ProtectedSet,
-        Tuppsub,
-    ),
+        v: dict,
+        listitem: tuple,
+        forbidden: tuple = (list, tuple, set, frozenset),
+        allowed: tuple = (
+                str,
+                int,
+                float,
+                complex,
+                bool,
+                bytes,
+                type(None),
+                ProtectedTuple,
+                ProtectedList,
+                ProtectedDict,
+                ProtectedSet,
+                Tuppsub,
+        ),
 ) -> Generator:
     """
     Flattens any dict, but should not be used directly, use fla_tu
@@ -92,22 +92,22 @@ def aa_flatten_dict_tu(
     """
 
     if (
-        isinstance(v, dict)
-        or (hasattr(v, "items") and hasattr(v, "keys"))
-        and not isinstance(v, allowed)
+            isinstance(v, dict)
+            or (hasattr(v, "items") and hasattr(v, "keys"))
+            and not isinstance(v, allowed)
     ):  # we check right away if it is a dict or something similar (with keys/items). If we miss something, we will
         # only get the keys back.
         for k, v2 in v.items():
             newtu = listitem + (k,)  # we accumulate all keys in a tuple
             if isinstance(v2, allowed):
-                yield Tuppsub((v2, (newtu)))
+                yield Tuppsub((v2, newtu))
             # and check if there are more dicts (nested) in this dict
             else:
                 yield from aa_flatten_dict_tu(
                     v2, listitem=newtu, forbidden=forbidden, allowed=allowed
                 )
     elif isinstance(v, forbidden) and not isinstance(
-        v, allowed
+            v, allowed
     ):  # if we have an iterable without keys (list, tuple, set, frozenset) we have to enumerate them to be able to
         # access the original dict values later: di['blabla'][0] instead of di['blabla']
 
@@ -148,42 +148,41 @@ def aa_flatten_dict_tu(
                     yield Tuppsub((v2, listitem))
         except Exception:
             # if there is an exception, it is probably not an iterable, so we yield it
-            Tuppsub((yield v, listitem))
+            yield Tuppsub((v, listitem))
 
 
 def fla_tu(
-    item: Any,
-    walkthrough: Union[
-        tuple, None
-    ] = None,  # accumulate nested keys / don't pass anything here unless you know what you are doing
-    forbidden: tuple = (
-        list,
-        tuple,
-        set,
-        frozenset,
-    ),  # forbidden to yield, need to be flattened
-    allowed: tuple = (  # Data types we don't want to touch!
-        str,
-        int,
-        float,
-        complex,
-        bool,
-        bytes,
-        type(None),
-        ProtectedTuple,  #
-        ProtectedList,
-        ProtectedDict,
-        ProtectedSet,
-        Tuppsub  # This is the secret - Inherit from tuple and exclude it from being flattened -
-        # ProtectedTuple does the same thing
-    ),
-    dict_variation=(  # we don't check with isinstance(), rather with type(), that way we don't have to import collections.
-        "collections.defaultdict",
-        "collections.UserDict",
-        "collections.OrderedDict",
-    ),
+        item: Any,
+        walkthrough:
+        tuple = (),  # accumulate nested keys / don't pass anything here unless you know what you are doing
+        forbidden: tuple = (
+                list,
+                tuple,
+                set,
+                frozenset,
+        ),  # forbidden to yield, need to be flattened
+        allowed: tuple = (  # Data types we don't want to touch!
+                str,
+                int,
+                float,
+                complex,
+                bool,
+                bytes,
+                type(None),
+                ProtectedTuple,  #
+                ProtectedList,
+                ProtectedDict,
+                ProtectedSet,
+                Tuppsub  # This is the secret - Inherit from tuple and exclude it from being flattened -
+                # ProtectedTuple does the same thing
+        ),
+        dict_variation=(
+        # we don't check with isinstance(), rather with type(), that way we don't have to import collections.
+                "collections.defaultdict",
+                "collections.UserDict",
+                "collections.OrderedDict",
+        ),
 ) -> Generator:
-
     """
     Use this function to flatten any iterable
 
@@ -342,8 +341,6 @@ def fla_tu(
             Generator
 
     """
-    if walkthrough is None:
-        walkthrough = ()
     if isinstance(item, allowed):  # allowed items, so let's yield them
         yield Tuppsub((item, (walkthrough,)))
     elif isinstance(item, forbidden) and not isinstance(item, allowed):
@@ -361,12 +358,12 @@ def fla_tu(
                 except Exception:
 
                     yield Tuppsub(
-                        (xaa, (walkthrough + Tuppsub((ini,))))
+                        (xaa, (walkthrough + (ini,)))
                     )  # we just yield the value (value, (key1,key2,...))  because it is probably not an iterable
             else:
-                yield xaa, Tuppsub((walkthrough + Tuppsub((ini,))))
+                yield Tuppsub((xaa, (walkthrough + (ini,))))
     elif isinstance(
-        item, dict
+            item, dict
     ):  # we need to pass dicts to aa_flatten_dict_tu(), they need a special treatment, if not, we only get the keys from the dict back
         if not isinstance(item, allowed):
             yield from aa_flatten_dict_tu(
@@ -379,7 +376,7 @@ def fla_tu(
     #
     # -> (hasattr(item, "items") and hasattr(item, "keys") -> Maybe better here:     elif isinstance( item, dict ):
     elif (str(type(item)) in dict_variation) or (
-        hasattr(item, "items") and hasattr(item, "keys")
+            hasattr(item, "items") and hasattr(item, "keys")
     ):
         if not isinstance(item, allowed):
             yield from aa_flatten_dict_tu(
@@ -391,10 +388,12 @@ def fla_tu(
     elif "DataFrame" in str(type(item)):
 
         yield from aa_flatten_dict_tu(
-            item.to_dict(),  # pandas needs to be converted to dict first, if not, we only get the columns back. Copying might not be necessary
+            item.to_dict(),
+            # pandas needs to be converted to dict first, if not, we only get the columns back. Copying might not be necessary
             listitem=walkthrough,
             forbidden=forbidden,
             allowed=allowed,
+
         )
 
     # # many iterables are hard to identify using isinstance() / type(), so we have to use brute force to check if it is
@@ -411,8 +410,8 @@ def fla_tu(
                     else:  # if it is not in the allowed data types, we check recursively for other iterables
                         yield from fla_tu(
                             xaa,
-                            walkthrough=Tuppsub(
-                                (walkthrough + Tuppsub(ini2,))
+                            walkthrough=(
+                                (walkthrough + (ini2,))
                             ),  # yields (value, (key1,key2,...))
                             forbidden=forbidden,
                             allowed=allowed,
@@ -549,11 +548,11 @@ def flatten_nested_something_to_list_of_tuples(nested_whatever) -> list[tuple]:
 
 
 def create_random_dict(
-    length: int = 50,
-    min_depth: int = 100,
-    max_depth: int = 300,
-    keyrandrange: tuple = (1, 20000),
-    valuepicklist: Union[list, None] = None,
+        length: int = 50,
+        min_depth: int = 100,
+        max_depth: int = 300,
+        keyrandrange: tuple = (1, 20000),
+        valuepicklist: Union[list, None] = None,
 ) -> defaultdict:
     """
     Create random nested dicts for testing
