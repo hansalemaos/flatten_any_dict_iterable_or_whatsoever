@@ -4,6 +4,8 @@
 
 ### Updates
 
+##### pip install flatten-any-dict-iterable-or-whatsoever
+
 **2022/09/30**: Fixed some problems with ProtectedDict and ProtectedList,ProtectedTuple
 
 **2022/09/30**: Can be used as a generator now: **from flatten_any_dict_iterable_or_whatsoever import fla_tu**
